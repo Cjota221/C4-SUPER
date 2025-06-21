@@ -70,7 +70,7 @@
         .nav-menu { list-style: none; flex-grow: 1; padding-top: 20px; display: flex; flex-direction: column; }
         .nav-item a { display: flex; align-items: center; padding: 16px 24px; color: var(--text-light); text-decoration: none; font-weight: 600; transition: all 0.2s ease; gap: 16px; font-size: 16px; border-radius: 0 var(--border-radius) var(--border-radius) 0; margin-right: 12px;}
         .nav-item a:hover { background-color: var(--bg-light); color: var(--primary-pink); }
-        .nav-item a.active { color: var(--primary-pink); background-color: #fceef6; border-right: 4px solid var(--primary-pink); }
+        .nav-item a.active { color: var(--primary-pink); background-color: #fceef6; }
         .nav-item i { font-size: 24px; }
         .nav-item.settings-item { border-top: 1px solid var(--border-color); padding-top: 8px; margin-top:auto; }
         .nav-item.profile-item { padding-bottom: 8px; }
@@ -135,7 +135,7 @@
         .modal-body { overflow-y: auto; flex-grow: 1; padding-right: 10px;}
         .form-group { display: flex; flex-direction: column; margin-bottom: 16px;}
         .form-group label { margin-bottom: 8px; font-weight: 600; font-size: 14px; }
-        .form-group input, .form-group textarea { padding: 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); outline: none; width: 100%; font-family: var(--font-main); }
+        .form-group input, .form-group textarea, .form-group select { padding: 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); outline: none; width: 100%; font-family: var(--font-main); }
         .form-group textarea { resize: vertical; min-height: 80px; }
         .modal-footer { margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; flex-shrink: 0; }
 
@@ -152,7 +152,7 @@
         #add-product-modal .modal-content { max-width: 800px; }
         #add-product-modal #add-product-form { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
         #add-product-modal .form-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
-        #add-product-modal .photo-uploader { grid-row: 1 / 4; }
+        #add-product-modal .photo-uploader { grid-row: 1 / 5; }
         #product-photo-upload { display: none; }
         #product-photo-label { display: flex; align-items: center; justify-content: center; width: 100%; height: 200px; border: 2px dashed var(--border-color); border-radius: var(--border-radius); cursor: pointer; flex-direction: column; color: var(--text-light); }
         #product-photo-label img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--border-radius); }
@@ -204,9 +204,9 @@
             <div class="sidebar-header"><a href="#" class="logo">C4</a></div>
             <ul class="nav-menu">
                 <li class="nav-item"><a href="#" class="nav-link active" data-target="dashboard"><i class="ph-bold ph-gauge"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-target="despesas"><i class="ph-bold ph-receipt"></i> Despesas</a></li>
                 <li class="nav-item"><a href="#" class="nav-link" data-target="produtos"><i class="ph-bold ph-package"></i> Produtos</a></li>
                 <li class="nav-item"><a href="#" class="nav-link" data-target="vendas"><i class="ph-bold ph-shopping-cart-simple"></i> Vendas</a></li>
-                <li class="nav-item"><a href="#" class="nav-link" data-target="despesas"><i class="ph-bold ph-receipt"></i> Despesas</a></li>
                 <li class="nav-item"><a href="#" class="nav-link" data-target="clientes"><i class="ph-bold ph-users"></i> Clientes</a></li>
                 <li class="nav-item"><a href="#" class="nav-link" data-target="planejamento"><i class="ph-bold ph-flag-checkered"></i> Planejamento</a></li>
                 <li class="nav-item"><a href="#" class="nav-link" data-target="gamificacao"><i class="ph-bold ph-trophy"></i> Gamificação</a></li>
@@ -396,7 +396,7 @@
     <div id="add-product-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Adicionar Produto</h2>
+                <h2 class="modal-title" id="product-modal-title">Adicionar Produto</h2>
                 <button id="add-product-close-btn" class="close-modal"><i class="ph ph-x"></i></button>
             </div>
             <form id="add-product-form">
@@ -413,6 +413,17 @@
                         <div class="form-group">
                             <label for="product-name">Nome do Produto</label>
                             <input type="text" id="product-name" required>
+                        </div>
+                         <div class="form-group">
+                            <label for="product-category">Categoria</label>
+                            <select id="product-category">
+                                <option value="Roupas">Roupas</option>
+                                <option value="Calçados">Calçados</option>
+                                <option value="Confeitaria">Confeitaria</option>
+                                <option value="Cosméticos">Cosméticos</option>
+                                <option value="Bijuteria">Bijuteria</option>
+                                <option value="Outros">Outros</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="product-description">Descrição</label>
@@ -557,16 +568,25 @@
             
             // --- PRODUCTS PAGE LOGIC ---
             const productsLogic = () => {
+                let productsData = [
+                    { id: 1, name: 'Bolo de Chocolate', category: 'Confeitaria', price: 55.00, cost: 25.50, stock: 15, photoUrl: null },
+                    { id: 2, name: 'Torta de Limão', category: 'Confeitaria', price: 70.00, cost: 35.00, stock: 8, photoUrl: null },
+                    { id: 3, name: 'Sandália Anabela', category: 'Calçados', price: 120.00, cost: 55.00, stock: 25, photoUrl: null },
+                ];
+
                 const addProductBtn = document.getElementById('add-product-btn');
                 const addProductModal = document.getElementById('add-product-modal');
                 const addProductCloseBtn = document.getElementById('add-product-close-btn');
                 const productCancelBtn = document.getElementById('product-cancel-btn');
+                const addProductForm = document.getElementById('add-product-form');
                 
-                addProductBtn.addEventListener('click', () => {
-                    document.getElementById('calc-unit-expense').textContent = formatCurrency(appState.custoUnitarioTotal);
-                    updatePricingCalculator(); 
-                    addProductModal.classList.add('is-open');
-                });
+                const productModalTitle = document.getElementById('product-modal-title');
+                const productIdInput = document.createElement('input');
+                productIdInput.type = 'hidden';
+                productIdInput.id = 'product-id';
+                addProductForm.prepend(productIdInput);
+
+                addProductBtn.addEventListener('click', () => openProductModal());
                 addProductCloseBtn.addEventListener('click', () => addProductModal.classList.remove('is-open'));
                 productCancelBtn.addEventListener('click', () => addProductModal.classList.remove('is-open'));
                 
@@ -624,13 +644,84 @@
                     if (file) { const reader = new FileReader(); reader.onload = (event) => { photoLabel.innerHTML = `<img src="${event.target.result}" alt="Pré-visualização do produto">`; }; reader.readAsDataURL(file); }
                 });
 
-                let productsData = [{ id: 1, name: 'Bolo de Chocolate', category: 'Bolos', price: 55.00, cost: 25.50, stock: 15 }];
                 const stockValueEl = document.getElementById('stock-value-total');
                 const profitPotentialEl = document.getElementById('stock-profit-potential');
                 const stockQuantityEl = document.getElementById('stock-quantity-total');
                 const productsTableBody = document.getElementById('products-table-body');
                 function calculateStockSummary() { const v = productsData.reduce((a, p) => a + (p.cost * p.stock), 0); const l = productsData.reduce((a, p) => a + ((p.price - p.cost) * p.stock), 0); const q = productsData.reduce((a, p) => a + p.stock, 0); stockValueEl.textContent = formatCurrency(v); profitPotentialEl.textContent = formatCurrency(l); stockQuantityEl.textContent = q; }
-                function renderProducts() { productsTableBody.innerHTML = ''; productsData.forEach(p => { const r = productsTableBody.insertRow(); r.innerHTML = `<td><strong>${p.name}</strong></td><td>${p.category}</td><td>${formatCurrency(p.price)}</td><td>${formatCurrency(p.cost)}</td><td>${p.stock}</td><td class="actions-cell"><button title="Editar"><i class="ph ph-pencil-simple"></i></button><button title="Excluir"><i class="ph ph-trash"></i></button></td>`; }); }
+                function renderProducts() { productsTableBody.innerHTML = ''; productsData.forEach(p => { const r = productsTableBody.insertRow(); r.innerHTML = `<td><strong>${p.name}</strong></td><td>${p.category || 'N/A'}</td><td>${formatCurrency(p.price)}</td><td>${formatCurrency(p.cost)}</td><td>${p.stock}</td><td class="actions-cell"><button class="edit-btn" data-id="${p.id}" title="Editar"><i class="ph ph-pencil-simple"></i></button><button class="delete-btn" data-id="${p.id}" title="Excluir"><i class="ph ph-trash"></i></button></td>`; }); }
+                
+                function handleProductSubmit(e) {
+                    e.preventDefault();
+                    const id = parseInt(productIdInput.value);
+
+                    const productData = {
+                        id: id || Date.now(),
+                        name: document.getElementById('product-name').value,
+                        category: document.getElementById('product-category').value,
+                        description: document.getElementById('product-description').value,
+                        cost: parseFloat(document.getElementById('product-base-cost').value),
+                        price: parseFloat(document.getElementById('final-price-value').textContent.replace('R$ ', '').replace(',', '.')),
+                        stock: id ? productsData.find(p => p.id === id).stock : 10, // Keep stock on edit, placeholder for new
+                        photoUrl: document.querySelector('#product-photo-label img')?.src || null
+                    };
+
+                    if (id) { // Editing
+                        const index = productsData.findIndex(p => p.id === id);
+                        if (index !== -1) productsData[index] = productData;
+                    } else { // Adding
+                        productsData.push(productData);
+                    }
+                    
+                    renderProducts();
+                    calculateStockSummary();
+                    addProductModal.classList.remove('is-open');
+                }
+
+                function openProductModal(id = null) {
+                    addProductForm.reset();
+                    productIdInput.value = id || '';
+                    document.getElementById('product-photo-label').innerHTML = `<i class="ph-fill ph-camera" style="font-size: 48px;"></i><span>Clique para adicionar</span>`;
+                    otherCostsContainer.innerHTML = '';
+                    
+                    const isEdit = id !== null;
+                    const item = isEdit ? productsData.find(p => p.id === id) : null;
+                    
+                    productModalTitle.textContent = isEdit ? 'Editar Produto' : 'Adicionar Produto';
+                    document.getElementById('product-name').value = item ? item.name : '';
+                    document.getElementById('product-description').value = item ? item.description : '';
+                    document.getElementById('product-base-cost').value = item ? item.cost : '';
+                    document.getElementById('product-category').value = item ? item.category : 'Roupas';
+                    if (item && item.photoUrl) {
+                        document.getElementById('product-photo-label').innerHTML = `<img src="${item.photoUrl}" alt="Pré-visualização do produto">`;
+                    }
+                    
+                    document.getElementById('calc-unit-expense').textContent = formatCurrency(appState.custoUnitarioTotal);
+                    updatePricingCalculator();
+                    addProductModal.classList.add('is-open');
+                }
+
+                function handleProductDelete(id) {
+                    openConfirmation(() => {
+                        productsData = productsData.filter(p => p.id !== id);
+                        renderProducts();
+                        calculateStockSummary();
+                    });
+                }
+
+                productsTableBody.addEventListener('click', (e) => {
+                    const editBtn = e.target.closest('.edit-btn');
+                    if (editBtn) {
+                        openProductModal(parseInt(editBtn.dataset.id));
+                    }
+                    const deleteBtn = e.target.closest('.delete-btn');
+                    if (deleteBtn) {
+                        handleProductDelete(parseInt(deleteBtn.dataset.id));
+                    }
+                });
+
+                addProductForm.addEventListener('submit', handleProductSubmit);
+
                 calculateStockSummary(); renderProducts();
             };
             
